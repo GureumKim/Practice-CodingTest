@@ -1,38 +1,34 @@
-from sys import stdin; input= stdin.readline
 import heapq
-def dijkstra(s):
+
+def dijkstra(start):
+    visited = [0]*(V+1)
     heap = []
-    heapq.heappush(heap,(0,s))
-    result[s] = 0
-    visited = [0]*(v+1)
+    heapq.heappush(heap,(0,start))
+    # 자기 자신도 경유할 거기 때문에 미리 visited에 체크하지 않음!
+    # visited[start]=1
+    res[start] = 0
 
     while heap:
-        via_cost, via = heapq.heappop(heap)
-        # via_cost 와 result[via]가 같을 때는 체크하지 않는다 (처음 자기 자신 방문 시에 바로 continue가 실행 됨)
-        if visited[via] or via_cost > result[via]: continue
-        # 자기 자신도 방문해야 하므로 visited 여부 체크 위치는 여기
+        v_cost, via = heapq.heappop(heap)
+        if visited[via]: continue
         visited[via] = 1
-        for next, cost in adj[via]:
-            # print(next, cost)
-            cost += via_cost
-            if result[next] > cost:
-                result[next] = cost
-                heapq.heappush(heap,(cost,next))
-            # print(result)
 
-v, e = map(int,input().split())
+        if res[via] < v_cost: continue
+        for next, c in adj[via]:
+            cost = c+ v_cost
+            if res[next] > cost:
+                res[next] = cost
+                heapq.heappush(heap,(res[next],next))
+
+V, E = map(int,input().split())
+adj = [[] for _ in range(V+1)]
 start = int(input())
-adj = [ [] for _ in range(v+1)]
-for _ in range(e):
-    fr, to, cost = map(int,input().split())
-    adj[fr].append((to,cost))
-    # 문제 조건 : 방향 그래프 -> 아래 코드 필요 x
-    # adj[to].append((fr,cost))
+for _ in range(E):
+    u,v,w = map(int,input().split())
+    adj[u].append((v,w))
 
-inf = float("inf")
-result = [inf]*(v+1)
-
+INF = float('inf')
+res = [INF]*(V+1)
 dijkstra(start)
-
-for i in range(1,v+1):
-    print("INF" if result[i] == inf else result[i])
+for i in range(1,V+1):
+    print("INF" if res[i]==INF else res[i])
