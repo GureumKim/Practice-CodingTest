@@ -1,20 +1,13 @@
 def solution(numbers, target):
-    answer = 0 
+    from functools import lru_cache
     
-    level = len(numbers)
-    now = 0
-    
-    def dfs(value, lev = 0):
-        ans = 0
-        if lev == level:
-            if value == target:
-                # answer += 1
-                return 1
-            return 0
+    # least recent used cache 
+    # @lru_cache(maxsize)
+    @lru_cache(None)
+    def dfs(lev = 0, value = 0):
+        if lev == len(numbers):
+            return 1 if value == target else 0
         
-        ans += dfs(value + numbers[lev], lev+1)
-        ans += dfs(value - numbers[lev], lev + 1)
-        return ans
+        return dfs(lev + 1, value + numbers[lev]) + dfs(lev + 1, value - numbers[lev])
     
-    answer = dfs(now)
-    return answer
+    return dfs()
