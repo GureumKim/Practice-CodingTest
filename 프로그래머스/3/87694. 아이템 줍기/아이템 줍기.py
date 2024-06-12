@@ -27,6 +27,7 @@ def solution(rectangle, characterX, characterY, itemX, itemY):
     q = deque()
     q.append((characterX*2, characterY*2, 0))
     visited = [[False] * 101 for _ in range(101)]
+    # Y, X  - 행, 열 헷갈리지 말자!!
     visited[characterY*2][characterX*2] = True
     
     dir = [(0,1), (0,-1), (1,0), (-1,0)]
