@@ -1,10 +1,13 @@
 def solution(numbers, target):
     from functools import lru_cache
 
+    # least recent used cache
+    # @lru_cache(maxsize)
     @lru_cache(None)
-    def dfs(l, t, last, v = 0):
-        if l == last:
-            return 1 if v == target else 0
-        return dfs(l+1,t,last,v+numbers[l]) + dfs(l+1,t,last,v-numbers[l])
+    def dfs(lev=0, value=0):
+        if lev == len(numbers):
+            return 1 if value == target else 0
 
-    return dfs(0,target,len(numbers))
+        return dfs(lev + 1, value + numbers[lev]) + dfs(lev + 1, value - numbers[lev])
+
+    return dfs()
