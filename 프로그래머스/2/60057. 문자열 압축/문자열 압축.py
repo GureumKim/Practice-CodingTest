@@ -1,10 +1,4 @@
 def solution(s):
-    def calc_len():
-        pass
-    
-    def split():
-        pass
-
     
     l = len(s)
     min_ = l
@@ -14,9 +8,10 @@ def solution(s):
         temp = "" 
         now = s[start:start + i]
         cnt = 1
+        
         while 1:
-            next = s[end: end + i]
-            if now == next:
+            nxt = s[end: end + i]
+            if now == nxt:
                 cnt+=1
             else:
                 if cnt == 1:
