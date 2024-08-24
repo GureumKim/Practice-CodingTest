@@ -1,60 +1,73 @@
-from sys import stdin; input = stdin.readline
+from sys import stdin
+input = stdin.readline
 from collections import deque
 
-# 이어졌는 지 끊겼는지 체크를
-# 한 사이클이 지나면 계속, 계속 해줘야 함!!
 
-def grouping(y,x,arr,v):
+def main():
+    dx = [0, 0, 1, -1]
+    dy = [1, -1, 0, 0]
+    n, m = map(int, input().split())
+    field = list(list(map(int, input().split())) for _ in range(n))
+    glacier = deque()
+    answer = 0
 
-    parts = deque()
-    parts.append((y,x))
-    v[y][x] = 1
+    def melt(glc: deque) -> deque:
+        melted = []
+        res = deque()
 
-    while parts:
-        y,x = parts.popleft()
-        for di, dj in [(0,1),(1,0),(0,-1),(-1,0)]:
-            dy,dx = y +di, x +dj
-            if arr[dy][dx] and not v[dy][dx]:
-                v[dy][dx] = 1
-                parts.append((dy,dx))
+        while glc:
+            y, x, t = glc.popleft()
+            cnt = 0
+            for k in range(4):
+                ny, nx = y + dy[k], x + dx[k]
+                if ny < 0 or nx < 0 or ny > n or nx > m: continue
+                if field[ny][nx] == 0:
+                    cnt += 1
+            if field[y][x] - cnt > 0:
+                res.append((y, x, field[y][x] - cnt))
+                field[y][x] = field[y][x] - cnt
+            else:
+                melted.append((y, x))
+        for i, j in melted:
+            field[i][j] = 0
+        return res
 
-    return 1
+    def grouping(sy, sx):
+        q = deque()
+        q.append((sy, sx))
+        visited[sy][sx] = True
 
-def solve(n,m,arr):
-    melted = deque()
-    time = 0
+        while q:
+            y, x = q.popleft()
+            for k in range(4):
+                ny, nx = dy[k] + y, dx[k] + x
+                if 1 <= ny < n-1 and 1 <= nx < m-1 and not visited[ny][nx] and field[ny][nx]:
+                    visited[ny][nx] = True
+                    q.append((ny, nx))
 
-    while True:
-        visited = [[0] * m for _ in range(n)]
-        for i in range(1,n-1):
-            for j in range(1,m-1):
-                if arr[i][j] == 0: continue
-                cnt = 0
-                for di, dj in [(1,0),(0,1),(-1,0),(0,-1)]:
-                    dy, dx = i+di, j+dj
-                    if arr[dy][dx] == 0:
-                        cnt +=1
-                if cnt:
-                    melted.append((i,j,cnt))
+    for i in range(1, n-1):
+        for j in range(1, m-1):
+            if field[i][j]:
+                glacier.append((i, j, field[i][j]))
 
-        while melted:
-            y,x, d = melted.popleft()
-            arr[y][x] = max(0,arr[y][x]-d)
+    while glacier:
+        answer += 1
+        glacier = melt(glacier)
+        # for i in range(n):
+        #     print(*field[i])
+        visited = [[False] * m for _ in range(n)]
 
         group = 0
-        for i in range(1,n-1):
-            for j in range(1,m-1):
-                if arr[i][j] and not visited[i][j]:
-                    group += grouping(i,j,arr,visited)
+        for i in range(1, n-1):
+            for j in range(1, m-1):
+                if field[i][j] and not visited[i][j]:
+                    grouping(i, j)
+                    group += 1
                 if group > 1:
-                    return time+1
+                    print(answer)
+                    return
+    print(0)
 
-        if group == 0:
-            return 0
-
-        time += 1
 
 if __name__ == "__main__":
-    n,m = map(int,input().split())
-    area = [list(map(int,input().split())) for _ in range(n)]
-    print(solve(n,m,area))
+    main()
