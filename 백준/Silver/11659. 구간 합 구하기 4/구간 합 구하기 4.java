@@ -11,19 +11,15 @@ public class Main {
 		int N = Integer.parseInt(st.nextToken());
 		int M = Integer.parseInt(st.nextToken());
 		
-		int[] num = new int[N + 1];
-		st = new StringTokenizer(br.readLine());
-		for (int i = 1; i <= N; i++) {
-			num[i] = Integer.parseInt(st.nextToken());
-		}
 		
+		st = new StringTokenizer(br.readLine());
 		// 구간 합 배열 생성
 		int[] accSum = new int[N + 1];
 		for (int i = 1; i <= N; i++) {
-			accSum[i] = num[i] + accSum[i - 1];
+			accSum[i] = accSum[i - 1] + Integer.parseInt(st.nextToken());
 		}
 		
-		// 구간 합 구하기
+		// 구간 합 구하
 		
 		for (int i = 0; i < M; i++) {
 			st = new StringTokenizer(br.readLine());
