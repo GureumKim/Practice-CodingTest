@@ -4,47 +4,38 @@ import java.util.*;
 public class Main {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		int N, M;
 		StringTokenizer st = new StringTokenizer(br.readLine());
-		int N = Integer.parseInt(st.nextToken());
-		int M = Integer.parseInt(st.nextToken());
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
 		
-		
-		// field 2차원 배열 생성
 		int[][] field = new int[N][M];
-		
+		// 컬렉션 어떻게 써야하는지 구조 알아보자 
+		Queue<int[]> queue = new LinkedList<>();
 		for (int i = 0; i < N; i++) {
 			st = new StringTokenizer(br.readLine());
 			for (int j = 0; j < M; j++) {
 				field[i][j] = Integer.parseInt(st.nextToken());
+				if (field[i][j] != 0) {
+					queue.add(new int[] {i, j ,field[i][j]});
+				}
 			}
 		}
 		
-		// 빙하의 위치와 높이 데이터
-		Queue<int[]> glacier = new LinkedList<>();
-		for (int i = 1; i <= N - 1; i++) {
-			for (int j = 1; j <= M - 1; j++) {
-				if (field[i][j] != 0)
-					glacier.add(new int[]{i, j, field[i][j]});
-			}
-		}
-		
-		br.close();
-		
-		int years = 0;
-		while (!glacier.isEmpty()) {
-			years++;
-			glacier = melt(field, glacier, N, M);
-			int groupCount = 0;
+		int year = 0;
+		while (!queue.isEmpty()) {
+			queue = melting(field, queue);
+			year++;
+			int group = 0;
 			boolean[][] visited = new boolean[N][M];
-			
-			for (int i = 0; i < N-1; i++) {
-				for (int j = 0; j < M-1; j++) {
+			for (int i = 1; i < N - 1; i++) {
+				for (int j = 1; j < M - 1; j++) {
 					if (field[i][j] != 0 && !visited[i][j]) {
-						grouping(field, visited, i, j, N, M);
-						groupCount += 1;
+						grouping(field, visited, N, M, i, j);
+						group++;
 					}
-					if (groupCount > 1) {
-						System.out.println(years);
+					if (group > 1) {
+						System.out.println(year);
 						return;
 					}
 				}
@@ -53,63 +44,58 @@ public class Main {
 		System.out.println(0);
 	}
 	
-	private static Queue<int[]> melt(int[][] field, Queue<int[]> queue, int n, int m) {
-		Queue<int[]> nextGlacier = new LinkedList<>();
+	// 왜 여기다 static 써야 되지?
+	private static Queue<int[]> melting(int[][] field, Queue<int[]> glacier) {
+		int[] dx = {1, -1, 0, 0};
+		int[] dy = {0, 0, 1, -1};
+		Queue<int[]> restGlacier = new LinkedList<>();
 		List<int[]> melted = new ArrayList<>();
-		int[] dx = new int[] {0, 0, -1, 1};
-		int[] dy = new int[] {-1, 1, 0, 0};
-		while (!queue.isEmpty()) {
-			int[] data = queue.poll();
+		
+		while (!glacier.isEmpty()) {
+			int[] data = glacier.poll();
 			int y = data[0];
 			int x = data[1];
 			int h = data[2];
 			
 			int cnt = 0;
 			for (int k = 0; k < 4; k++) {
-				int ny, nx;
-				ny = dy[k] + y;
-				nx = dx[k] + x;
-				if (ny < 0 || nx < 0 || ny > n || nx > m) continue;
-				if (field[ny][nx] == 0) {
-					cnt += 1;
-				}
+				int nx = x + dx[k];
+				int ny = y + dy[k];
+				if (field[ny][nx] == 0) cnt++;
 			}
 			if (h - cnt > 0) {
-				nextGlacier.add(new int[]{y, x, h - cnt});
+				restGlacier.add(new int[] {y, x, h - cnt});
 				field[y][x] = h - cnt;
-			}
-			else 
+			} else {
 				melted.add(new int[] {y, x});
+			}
 		}
 		for (int i = 0; i < melted.size(); i++) {
-			int[] data = melted.get(i);
-			int y = data[0];
-			int x = data[1];
-			field[y][x] = 0;
+			field[melted.get(i)[0]][melted.get(i)[1]] = 0;
 		}
 		
-		return nextGlacier;
+		
+		return restGlacier;
 	}
 	
-	private static void grouping(int[][] field, boolean[][] visited, int sY, int sX, int n, int m) {
-		int[] dy = {1, -1, 0, 0};
-		int[] dx = {0, 0, 1, -1};
-		Queue<int[]> queue = new LinkedList<>();
-		queue.add(new int[] {sY, sX});
-		visited[sY][sX] = true;
-		
-		while (!queue.isEmpty()) {
-			int[] data = queue.poll();
-			int y = data[0];
-			int x = data[1];
-			for (int i = 0; i < 4; i++) {
-				int ny = dy[i] + y;
-				int nx = dx[i] + x;
-				if (ny < 1 || nx < 1 || ny >= n-1 || nx >= m-1 || visited[ny][nx] || field[ny][nx] == 0) continue;
+	private static void grouping(int[][] field, boolean[][] visited, int n, int m, int startY, int startX) {
+		int[] dx = {1, -1, 0, 0};
+		int[] dy = {0, 0, 1, -1};
+	
+		Stack<int[]> stack = new Stack<>();
+		stack.add(new int[]{startX, startY});
+		visited[startY][startX] = true;
+		while (!stack.isEmpty()) {
+			int[] data = stack.pop();
+			int x = data[0];
+			int y = data[1];
+			for (int k = 0; k < 4; k++) {
+				int nx = x + dx[k];
+				int ny = y + dy[k];
 				
+				if(nx < 1 || ny < 1 || nx >= m - 1 || ny >= n - 1 || field[ny][nx] == 0 || visited[ny][nx]) continue;
+				stack.add(new int[] {nx, ny});
 				visited[ny][nx] = true;
-				queue.add(new int[] {ny, nx});
-				
 			}
 		}
 	}
