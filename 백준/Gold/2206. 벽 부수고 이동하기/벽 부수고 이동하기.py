@@ -1,50 +1,39 @@
-from sys import stdin; input = stdin.readline
-from collections import deque
+def main():
+    from sys import stdin
+    from collections import deque
 
-def min_dist():
-    # global mn
+    def bfs():
+        dx = [0, 0, -1, 1]
+        dy = [-1, 1, 0, 0]
+        visited = [[0] * m for _ in range(n)]
 
-    q = deque()
-    # y, x, dist, chance
-    q.append((0,0,1,1))
-    visited = [[0]*m for _ in range(n)]
-    visited[0][0] = 1
+        q = deque([(0, 0, 1, 1)])
+        visited[0][0] = 2
 
-    while q:
-        y,x, dist, chance = q.popleft()
-        if y==n-1 and x==m-1:
-            return dist
-        for di, dj in [(0,1),(1,0),(0,-1),(-1,0)]:
-            dy, dx = y+di, x+dj
-            if not (0<=dy<n) or not (0<=dx<m): continue
+        while q:
+            y, x, chance, dist = q.popleft()
+            if y == n - 1 and x == m - 1:
+                return dist
+            for k in range(4):
+                ny, nx = y + dy[k], x + dx[k]
+                if 0 <= ny < n and 0 <= nx < m and visited[ny][nx] != 2:
+                    if chance:
+                        visited[ny][nx] = 2
+                        if _map[ny][nx] == '1':
+                            q.append((ny, nx, 0, dist + 1))
+                        else:
+                            q.append((ny, nx, chance, dist + 1))
+                    else:
+                        if _map[ny][nx] == '0' and visited[ny][nx] == 0:
+                            visited[ny][nx] = 1
+                            q.append((ny, nx, chance, dist + 1))
+        return -1
 
-            if chance:
-                if visited[dy][dx] == 1: continue
-                # 다음 changce 있는 상태에서 방문하면 벽을 이미 먼저 뚫었으니까 체크
-                # 앞으로는 길이 똑같을 텐데(0만 갈 수 있음, 미리 방문했으니까)
-                # chance 없는 상태에서 방문하면 이미 방문한 곳이니까 체크
+    input = stdin.readline
+    n, m = map(int, input().split())
+    _map = list(list(input().rstrip()) for _ in range(n))
+    print(bfs())
 
-                # 한 번 벽 뚫어도 끝까지 못갈 수 있으니
-                # chance 있을 때 없을 때 visited에 1,2 값 넣어서 분기
-                visited[dy][dx] = 1
-                if map_[dy][dx] == 0:
-                    q.append((dy,dx,dist+1,1))
-                else:
-                    q.append((dy,dx,dist+1,0))
 
-            else:
-                # 방문한적이 없어야하고, 이미 방문했으면 당연히 벽 안뚫은 애들보다
-                # 같거나 늦을 수 밖에 없음
-                if visited[dy][dx] == 0 and map_[dy][dx] == 0:
-                    # 벽 뚫으면 당연히 벽 안뚫고 간 것보다 같거나 빨리 갈 수 밖에 없음
-                    visited[dy][dx] = 2
-                    q.append((dy,dx,dist+1,0))
-
-    # 일단 쨌든 벽 부셔서 바로 도착할 때가 가장 적은 dist일 거기 때문에
-    # while 끝나고 분기 안해도 될듯..?
-    return -1
-
-n, m = map(int,input().split())
-map_ = [list(map(int,input().rstrip())) for _ in range(n)]
-ans = min_dist()
-print(ans)
+if __name__ == "__main__":
+    main()
