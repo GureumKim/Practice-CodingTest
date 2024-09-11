@@ -7,25 +7,20 @@ def main():
             print(*sq)
             return
 
-        for idx in range(len(num)):
-            if num_cnt[num[idx]] > 0:
-                sq[level] = num[idx]
-                num_cnt[num[idx]] -= 1
+        prev = -1
+        for i in range(n):
+            if prev != num[i] and not visited[i]:
+                visited[i] = True
+                sq[level] = num[i]
                 dfs(level + 1)
-                num_cnt[num[idx]] += 1
+                visited[i] = False
+                prev = num[i]
 
     n, m = map(int, input().split())
     sq = [0] * m
-    num_cnt = [0] * (10 ** 4 + 1)
+    visited = [False] * n
 
-    lst = list(map(int, input().split()))
-    num = list()
-    for i in range(n):
-        if num_cnt[lst[i]] == 0:
-            num.append(lst[i])
-        num_cnt[lst[i]] += 1
-    num.sort()
-
+    num = sorted(map(int, input().split()))
     dfs(0)
 
 
