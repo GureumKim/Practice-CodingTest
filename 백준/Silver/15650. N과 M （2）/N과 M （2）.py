@@ -1,12 +1,19 @@
-def dfs(n,m,level=0,start=1):
-    if level == m:
-        print(*choice)
-        return
-    for i in range(start,n+1):
-        choice[level] = i
-        dfs(n,m,level+1,i+1)
+def main():
+    from sys import stdin
+    input = stdin.readline
+
+    def dfs(now, level):
+        if level == m:
+            print(*sequence)
+            return
+        for i in range(now + 1, n + 1):
+            sequence[level] = i
+            dfs(i, level + 1)
+
+    n, m = map(int, input().split())
+    sequence = [0] * m
+    dfs(0, 0)
 
 
-n,m = map(int,input().split())
-choice = [0]*m
-dfs(n,m)
+if __name__ == "__main__":
+    main()
