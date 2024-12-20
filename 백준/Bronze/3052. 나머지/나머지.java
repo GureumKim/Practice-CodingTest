@@ -1,18 +1,23 @@
 import java.io.*;
-import java.util.*;
+//import java.util.*;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
 //		BufferedReader br = new BufferedReader(new FileReader("./input.txt"));
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
 		
-		Set<Integer> remainder = new HashSet<Integer>();
+		boolean[] remainder = new boolean[42];
 		for (int i = 0; i < 10; i++) {
-			remainder.add(Integer.parseInt(br.readLine()) % 42);
+			remainder[Integer.parseInt(br.readLine()) % 42] = true; 
 		}
 		
-		System.out.println(remainder.size());
+		int cnt = 0;
+		for (int i = 0; i < remainder.length; i++) {
+			if (remainder[i] == true)
+				cnt++;
+		}
+		
 		br.close();
+		System.out.println(cnt);
 	}
 }
