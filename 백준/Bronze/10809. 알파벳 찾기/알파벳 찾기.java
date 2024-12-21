@@ -8,20 +8,18 @@ public class Main {
 		
 		int[] res = new int[26];
 		Arrays.fill(res, -1);
-		char[] word = br.readLine().toCharArray();
+		String word = br.readLine();
 		
-		for (int i = 0; i < word.length; i++) {
-			if (res[word[i] - 'a'] == -1)
-				res[word[i] - 'a'] = i;
+		for (int i = word.length() - 1; i >= 0; i--) {
+				res[word.charAt(i) - 'a'] = i;
 		}
+		
 		br.close();
 		
-		
 		String result = ""; 
-		for (int i = 0; i < 25; i++) {
+		for (int i = 0; i < res.length; i++) {
 			result += res[i] + " ";
 		}
-		result += res[25];
 		System.out.println(result);
 	}
 }
